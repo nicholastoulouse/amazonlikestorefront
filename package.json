@@ -1,0 +1,24 @@
+{
+  "name": "amazonlikestorefront",
+  "version": "1.0.0",
+  "description": "Amazon-like storefront with Node and MySQL that takes in orders, tracks product sales across departments, summarizes highest-grossing departments in the store.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicholastoulouse/amazonlikestorefront.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nicholastoulouse/amazonlikestorefront/issues"
+  },
+  "homepage": "https://github.com/nicholastoulouse/amazonlikestorefront#readme",
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "inquirer": "^6.2.1",
+    "mysql": "^2.16.0"
+  }
+}
