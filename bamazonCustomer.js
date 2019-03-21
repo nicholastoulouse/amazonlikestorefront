@@ -19,22 +19,24 @@ function productInventory() {
   connection.query("SELECT * FROM products", function(err, res) {
     if (err) throw err;
     console.log(res);
-    //promptUser(res);
     connection.end();
   });
 }
 
-// Created a series of questions
-function promptCustomer(productList) {
+function promptCustomer() {
 
 inquirer.prompt([
 
+    // {
+    //   type: "list",
+    //   name: "menu",
+    //   choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
+    // },
     {
       type: "input",
-      name: "product_id",
+      name: "item_id",
       message: "What is the ID of the product you wish to buy?"
     },
-
     {
         type: "input",
         name: "units",
@@ -49,35 +51,41 @@ inquirer.prompt([
   
   ]).then(function(order) {
 
-    var SKU = order.product_id;
-    var qnty = order.units;
-    var fulfilled = order.placeOrder;
+    var SKU = order.item_id;
+    var qnty = parseInt(order.units);
+    console.log("Quantity sought is ", qnty);
 
-    var query = "SELECT product_name, stock_quantity FROM products WHERE ?";
-    connection.query(query, { product_id: SKU }, function(err, res) {
-    console.log(res);
-    if (fulfilled) { // If the user guesses the password...
-  
-      console.log("==============================================");
-      console.log("");
-      //console.log("Well a deal's a deal " + user.name);
-      console.log("You can stay as long as you like.");
-      //console.log("Just put down the " + user.carryingWhat.join(" and ") + ". It's kind of freaking me out.");
-      console.log("");
-      console.log("==============================================");
-    }
-  
-    // If the user doesn't guess the password...
-    else {
-  
-      console.log("==============================================");
-      console.log("");
-      console.log("We're sorry to see you canceled your order for " + qnty + " of " + SKU + ".");
-      console.log("I'm calling the cops!");
-      console.log("");
-      console.log("==============================================");
-  
-    }
+    var query = "SELECT product_name, price, stock_quantity FROM products WHERE ?";
+    connection.query(query, { item_id: SKU }, function(err, [res]) {
+
+      if (err) throw err;
+      var productName = res.product_name;
+      var newInventoryCount = parseInt(res.stock_quantity) - qnty;
+      var invoice = parseFloat(res.price) * qnty;
+
+      if (order.placeOrder && newInventoryCount < 0) {
+        console.log("==============================================");
+        console.log("");
+        console.log("Insufficient quantity!");
+        console.log("");
+        console.log("==============================================");
+        return;
+
+      } else if (order.placeOrder && newInventoryCount > 0){
+        
+        var query = "UPDATE products SET stock_quantity=" + newInventoryCount + " WHERE item_id=" + SKU;
+        connection.query(query, function(err, updtd) {
+          if (err) throw err;
+          console.log("updated products table ", updtd);
+          console.log("==============================================");
+          console.log("");
+          console.log("The total cost for " + qnty + " of " + productName + " with SKU of " + SKU + " is "+ invoice + ".");
+          console.log("Your order has been placed.");
+          console.log("");
+          console.log("==============================================");
+          return;
+        });
+      }
   });   
   });
 }
